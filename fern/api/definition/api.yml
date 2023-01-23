@@ -1,2 +1,9 @@
 name: api
-auth: bearer
+auth: api-key
+auth-schemes:
+  api-key:
+    header: X-API-KEY
+    name: apiKey
+default-environment: Production
+environments:
+  Production: https://api.humanloop.com/v2
