@@ -1,4 +1,4 @@
-# humanloop API
+# Humanloop API
 
 Tagging a release on this repository will update the:
 
@@ -11,7 +11,7 @@ Tagging a release on this repository will update the:
 
 This repository contains
 
-- humanloop's Fern API Definition which lives in the [definition](./fern/api/definition/) folder
+- Humanloop's Fern API Definition which lives in the [definition](./fern/api/definition/) folder
 - Generators (see [generators.yml](./fern/api/generators.yml))
 
 ## What is in the API Definition?
