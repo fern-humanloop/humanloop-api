@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  dataSnapshot: dataSnapshot.yml
+
+services:
+  http:
+    ModelsService:
+      auth: true
+      base-path: /projects/{project_id}
+      path-parameters:
+        project_id: string
+      endpoints:
+        fineTune:
+          path: /fine-tune
+          method: POST
+          docs: >-
+            Trigger the fine-tuning process for a specific base model and data
+            snapshot.
+          display-name: Fine Tune
+          request:
+            name: FineTuneModelRequest
+            body:
+              properties:
+                name: string
+                data_snapshot: string
+                config:
+                  docs: Configuration and hyper-parameters for the fine-tuning process
+                  type: FineTuneConfig
+                provider_api_keys:
+                  docs: >-
+                    API keys required by each provider to make API calls. These API keys are
+                    not stored by Humanloop.
+                  type: ProviderApiKeys
+          response: FineTunedModelResponse
+
+        getFineTunedModels:
+          path: /models/fine-tuned
+          method: GET
+          docs: Get a list of all fine-tuned models associated to a given project.
+          display-name: Get Fine Tuned Models
+          response: list<FineTunedModelResponse>
+
+        updateMultiple:
+          path: /models/fine-tuned/update
+          method: POST
+          docs: |-
+            Updates your fine-tuned models.
+            Uses the specified provider API keys for provider-specific details.
+          display-name: Update Fine Tuned Models
+          request:
+            name: UpdateFineTunedModelsRequest
+            body:
+              properties:
+                provider_api_keys: map<string, string>
+          response: UpdateFineTunedModelsResponse
+
+        update:
+          path: /models/fine-tuned/{id}
+          method: PATCH
+          docs: >-
+            Modifies user-specified attributes of the specified fine-tuned
+            models.
+          display-name: Update Fine Tuned Model
+          path-parameters:
+            id: string
+          request:
+            name: UpdateFineTunedModelRequest
+            body:
+              properties:
+                provider_api_keys: map<string, string>
+          response: UpdateFineTunedModelResponse
+
+types:
+  UpdateFineTunedModelsResponse:
+    properties:
+      updated: list<UpdateFineTunedModelResponse>
+      failed: list<UpdateFineTunedModelResponse>
+
+  UpdateFineTunedModelResponse:
+    properties:
+      id: string
+      error: optional<string>
+
+  FineTunedModelResponse:
+    properties:
+      id: string
+      name: string
+      status: string
+      model_name: optional<string>
+      data_snapshot:
+        docs: Details of the corresponding immutable dataset used for fine-tuning.
+        type: dataSnapshot.DataSnapshot
+      provider_id: optional<string>
+      config:
+        docs: Configuration details for the fine-tuned model.
+        type: FineTuneConfig
+      created_at: string
+      updated_at: string
+
+  FineTuneConfig:
+    properties:
+      provider:
+        docs: >-
+          The company who is hosting the target model.This is used only if an
+          existing experiment_id or model_config_id are not provided.
+        type: optional<ModelProvider>
+      base_model: string
+      validation_split: optional<double>
+      use_corrections: optional<boolean>
+      prompt_template: optional<string>
+      generation_template: optional<string>
+
+  ProviderApiKeys:
+    properties:
+      openai: optional<string>
+      ai21: optional<string>
+      mock: optional<string>
+      anthropic: optional<string>
+
+  ModelProvider:
+    docs: Supported model providers.
+    enum:
+      - openai
+      - ai21
+      - mock
+      - anthropic

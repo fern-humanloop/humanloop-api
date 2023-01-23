@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+services:
+  http:
+    AnnotationsService:
+      auth: true
+      base-path: /annotations
+      endpoints:
+        getAnnotationsAnnotationsGet:
+          path: ""
+          method: GET
+          docs: |-
+            Get a page of annotations data for a given project.
+            This endpoint works like `/tasks`, but you must provide
+            `page` and `size` parameters. Up to `size` records
+            will be returned, starting from `page` * `size`.
+            user relates to user.full_name.
+          display-name: Get Annotations
+          request:
+            query-parameters:
+              project_id: integer
+              size: optional<integer>
+              page: optional<integer>
+              complete: optional<boolean>
+              flagged: optional<boolean>
+              reviewed: optional<boolean>
+              user: optional<string>
+              keywords: optional<string>
+              task_id: optional<integer>
+
+        createAnnotationAnnotationsPost:
+          path: ""
+          method: POST
+          docs: Create an annotation
+          display-name: Create Annotation
+          request:
+            body: CreateAnnotationRequest
+
+        upsertAnnotationAnnotationsAnnotationIdPut:
+          path: /{annotation_id}
+          method: PUT
+          docs: |-
+            Create or update an annotation.
+            This endpoint is only used for single-label classification.
+          display-name: Upsert Annotation
+          path-parameters:
+            annotation_id: string
+          request:
+            body: UpsertAnnotationRequest
+
+        deleteAnnotationAnnotationsAnnotationIdDelete:
+          path: /{annotation_id}
+          method: DELETE
+          docs: Delete a given annotation
+          display-name: Delete Annotation
+          path-parameters:
+            annotation_id: string
+
+        updateAnnotationAnnotationsAnnotationIdPatch:
+          path: /{annotation_id}
+          method: PATCH
+          docs: Update a given annotation.
+          display-name: Update Annotation
+          path-parameters:
+            annotation_id: string
+          request:
+            body: UpdateAnnotationRequest
+          response: AnnotationResponse
+
+types:
+  CreateAnnotationRequest:
+    properties:
+      task_id: integer
+      external_id: optional<string>
+      label_id: optional<string>
+      start: optional<integer>
+      end: optional<integer>
+      text: optional<string>
+      strength: optional<double>
+
+  UpsertAnnotationRequest:
+    properties:
+      task_id: integer
+      label_id: optional<string>
+      start: optional<integer>
+      end: optional<integer>
+      text: optional<string>
+      strength: optional<double>
+
+  UpdateAnnotationRequest:
+    properties:
+      reviewed: optional<boolean>
+      start: optional<integer>
+      end: optional<integer>
+      label_id: optional<string>
+      strength: optional<double>
+      text: optional<string>
+
+  AnnotationResponse:
+    docs: An instance of a user-provided annotation
+    properties:
+      id: string
+      external_id: string
+      confidence: optional<double>
+      user: _InlinedType8
+      task: _InlinedType9
+      start: optional<integer>
+      end: optional<integer>
+      text: optional<string>
+      strength: optional<double>
+      label_id: string
+      label: _InlinedType10
+      result_type: string
+      reviewed: optional<boolean>
+
+  _InlinedType8:
+    extends:
+      - AnnotationUserResponse
+
+  _InlinedType9:
+    extends:
+      - AnnotationTaskResponse
+
+  _InlinedType10:
+    extends:
+      - commons.LabelResponse
+
+  AnnotationUserResponse:
+    docs: An instance of the user who made an annotation
+    properties:
+      id: integer
+      username: string
+      full_name: optional<string>
+      email_address: string
+
+  AnnotationTaskResponse:
+    docs: An instance of a task the annotation was created for
+    properties:
+      id: integer
+      url: optional<string>

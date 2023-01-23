@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+services:
+  http:
+    LabelsService:
+      auth: true
+      base-path: /outputs/{id}/labels
+      path-parameters:
+        id: integer
+      endpoints:
+        getAll:
+          path: ""
+          method: GET
+          docs: Get all labels for an existing project output definition
+          display-name: Get Labels
+          response: list<Label>
+
+        updateMultiple:
+          path: ""
+          method: PUT
+          docs: Update the data on an array of labels based on id
+          display-name: Update Labels
+          request: list<UpdateLabelRequest>
+          response: list<Label>
+
+        add:
+          path: ""
+          method: POST
+          docs: >-
+            Add a label or list of labels to an existing project's output
+            definition
+          display-name: Add Labels
+          response: list<Label>
+
+        deleteMultiple:
+          path: ""
+          method: DELETE
+          display-name: Delete Labels
+          request: list<UpdateLabelRequest>
+          response: list<Label>
+
+        update:
+          path: /{label_id}
+          method: PUT
+          docs: Update any of the data for an existing label with label_id
+          display-name: Update Label
+          path-parameters:
+            label_id: string
+          request:
+            body: UpdateLabelRequest
+          response: list<Label>
+
+        delete:
+          path: /{label_id}
+          method: DELETE
+          display-name: Delete Label
+          path-parameters:
+            label_id: string
+          response: list<Label>
+
+types:
+  Label:
+    docs: Data returned in the payload when adding, editing or deleting a label(s)
+    properties:
+      name: string
+      id: string
+      display_name: optional<string>
+      description: optional<string>
+      count: optional<integer>
+      object: optional<string>
+      output_id: integer
+      output: optional<Output>
+      created_at: optional<string>
+      updated_at: optional<string>
+
+  Output:
+    properties:
+      id: optional<integer>
+      name: string
+      display_name: optional<string>
+      description: optional<string>
+      task_type: TaskType
+      data_key: optional<string>
+      data_type: optional<commons.DataType>
+      project_id: optional<integer>
+      object: optional<string>
+
+  TaskType:
+    docs: What ML tasks we support for our outputs
+    enum:
+      - classification
+      - multi_label_classification
+      - sequence_tagging
+      - ordinal_regression
+      - generation
+
+  UpdateLabelRequest:
+    docs: >-
+      The definition of a Label used as part of an output
+      specification for a project and/or learner. The name will be a unique key
+      (within the scope of a single output) that will be referenced by
+      annotations
+      and predictions
+    properties:
+      id: optional<string>
+      name: optional<string>
+      display_name: optional<string>
+      description: optional<string>

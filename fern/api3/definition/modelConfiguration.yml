@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  model: model.yml
+
+services:
+  http:
+    ModelConfigurationService:
+      auth: true
+      base-path: /projects/{project_id}/model-configs
+      path-parameters:
+        project_id: string
+      endpoints:
+        getAll:
+          path: ""
+          method: GET
+          docs: Get an array of model_configs associated to your project
+          display-name: Get Project Model Configs
+          response: list<ProjectModelConfig>
+
+        delete:
+          path: /{model_config_id}
+          method: DELETE
+          docs: Delete a model configuration from your project.
+          display-name: Delete Project Model Config
+          path-parameters:
+            model_config_id: string
+
+        update:
+          path: /{model_config_id}
+          method: PATCH
+          docs: Update a model configuration within your project
+          display-name: Update Project Model Config
+          path-parameters:
+            model_config_id: string
+          request:
+            name: UpdateModelConfigResponse
+            body:
+              properties:
+                display_name: optional<string>
+                description: optional<string>
+          response: ProjectModelConfig
+
+types:
+  ProjectModelConfig:
+    properties:
+      id: string
+      project_id: optional<string>
+      display_name: string
+      model_name: string
+      prompt_template: optional<string>
+      provider:
+        docs: The organization hosting the target model.
+        type: model.ModelProvider
+      endpoint:
+        docs: Which of the providers' endpoints to use. E.g. Complete, Edit.
+        type: ModelEndpoint
+      created_at: string
+      updated_at: string
+      last_used: string
+      experiment_id: optional<string>
+
+  ModelEndpoint:
+    docs: Supported model provider endpoints.
+    enum:
+      - complete
+      - edit

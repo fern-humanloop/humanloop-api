@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+services:
+  http:
+    ModelsService:
+      auth: true
+      base-path: /projects/{project_id}
+      path-parameters:
+        project_id: string
+      endpoints:
+        fineTuneProjectsProjectIdFineTunePost:
+          path: /fine-tune
+          method: POST
+          docs: >-
+            Trigger the fine-tuning process for a specific base model and data
+            snapshot.
+          display-name: Fine Tune
+          request:
+            body: CreateFineTunedModelRequest
+          response: commons.FineTunedModelResponse
+
+        getFineTunedModelsProjectsProjectIdModelsFineTunedGet:
+          path: /models/fine-tuned
+          method: GET
+          docs: Get a list of all fine-tuned models associated to a given project.
+          display-name: Get Fine Tuned Models
+          response: list<commons.FineTunedModelResponse>
+
+        updateFineTunedModelsProjectsProjectIdModelsFineTunedUpdatePost:
+          path: /models/fine-tuned/update
+          method: POST
+          docs: |-
+            Updates your fine-tuned models.
+            Uses the specified provider API keys for provider-specific details.
+          display-name: Update Fine Tuned Models
+          request:
+            body: UpdateFineTunedModelsRequest
+          response: UpdateFineTunedModelsResponse
+
+        updateFineTunedModelProjectsProjectIdModelsFineTunedIdPatch:
+          path: /models/fine-tuned/{id}
+          method: PATCH
+          docs: >-
+            Modifies user-specified attributes of the specified fine-tuned
+            models.
+          display-name: Update Fine Tuned Model
+          path-parameters:
+            id: string
+          request:
+            body: UpdateFineTunedModelRequest
+          response: commons.FineTunedModelResponse
+
+types:
+  CreateFineTunedModelRequest:
+    properties:
+      name: string
+      data_snapshot: string
+      config: _InlinedType11
+      provider_api_keys: _InlinedType12
+
+  _InlinedType11:
+    docs: Configuration and hyper-parameters for the fine-tuning process
+    extends:
+      - commons.FineTuneConfig
+
+  _InlinedType12:
+    docs: >-
+      API keys required by each provider to make API calls. These API keys are
+      not stored by Humanloop.
+    extends:
+      - commons.ProviderApiKeys
+
+  UpdateFineTunedModelsRequest:
+    properties:
+      provider_api_keys: map<string, _InlinedType13>
+
+  _InlinedType13: string
+
+  UpdateFineTunedModelsResponse:
+    properties:
+      updated: list<commons.UpdateFineTunedModelsModel>
+      failed: list<commons.UpdateFineTunedModelsModel>
+
+  UpdateFineTunedModelRequest:
+    properties:
+      name: optional<string>

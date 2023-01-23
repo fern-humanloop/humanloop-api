@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+services:
+  http:
+    MonitoringService:
+      auth: true
+      base-path: ""
+      endpoints:
+        getLogsLogsGet:
+          path: /logs
+          method: GET
+          docs: >-
+            Retrieve paginated logs from the server.
+            Sorting and filtering are supported through query params.
+            See docstring of get_sorted_filtered_project_data_from_query_params
+            for more details.
+          display-name: Get Logs
+          request:
+            query-parameters:
+              project_id: string
+              search: optional<string>
+              metadata_search: optional<string>
+              start_date: optional<string>
+              end_date: optional<string>
+              size: optional<integer>
+              page: optional<integer>
+          response: PaginatedData_LogResponse_
+
+        deleteLogsLogsDelete:
+          path: /logs
+          method: DELETE
+          display-name: Delete Logs
+
+        exportRawLogsExportRawPost:
+          path: /logs/export-raw
+          method: POST
+          docs: >-
+            Retrieve filtered logs in a normalized CSV.
+            Sorting and filtering are supported through query params.
+            See docstring of get_sorted_filtered_project_data_from_query_params
+            for more details.
+          display-name: Export Raw
+          request:
+            query-parameters:
+              project_id: string
+              search: optional<string>
+              metadata_search: optional<string>
+              start_date: optional<string>
+              end_date: optional<string>
+
+        exportFineTuneLogsExportFineTunePost:
+          path: /logs/export-fine-tune
+          method: POST
+          docs: >-
+            Retrieve filtered logs in the format for fine-tuning.
+            Sorting and filtering are supported through query params.
+            See docstring of get_sorted_filtered_project_data_from_query_params
+            for more details.
+          display-name: Export Fine Tune
+          request:
+            query-parameters:
+              project_id: string
+              search: optional<string>
+              metadata_search: optional<string>
+              start_date: optional<string>
+              end_date: optional<string>
+            body: FineTuneFormatting
+
+        deleteFeedbackLabelProjectsProjectIdFeedbackFeedbackTypeFeedbackValueDelete:
+          path: /projects/{project_id}/feedback/{feedback_type}/{feedback_value}
+          method: DELETE
+          display-name: Delete Feedback Label
+          path-parameters:
+            project_id: string
+            feedback_type: string
+            feedback_value: string
+
+types:
+  PaginatedData_LogResponse_:
+    properties:
+      records: list<commons.LogResponse>
+      page: integer
+      size: integer
+      total: integer
+
+  FineTuneFormatting:
+    properties:
+      separator: optional<string>
+      completion_initial_whitespace: optional<string>
+      stop_sequence: optional<string>

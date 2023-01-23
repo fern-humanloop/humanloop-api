@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+services:
+  http:
+    UsersService:
+      auth: true
+      base-path: /users
+      endpoints:
+        readUserUsersMeGet:
+          path: /me
+          method: GET
+          docs: Validate user exists with valid password and return access token
+          display-name: Read User
+          response: commons.UserResponse
+
+        updateMeUsersMePut:
+          path: /me
+          method: PUT
+          docs: Update the profile of your current user
+          display-name: Update Me
+          request:
+            body: UpdateUserRequest
+          response: commons.UserResponse
+
+        createUserUsersPost:
+          path: ""
+          method: POST
+          docs: Create a new user.
+          display-name: Create User
+          request:
+            body: UserRequest
+
+        inviteUserUsersInvitePost:
+          path: /invite
+          method: POST
+          docs: >-
+            Invite a user to your project using their email address. They will
+            receive
+            an email invite with a link to signup to Humanloop. When they log in
+            they will
+            then see the project they have been invited to.
+          display-name: Invite User
+          request:
+            query-parameters:
+              id: optional<integer>
+            body: UserInviteRequest
+
+        recoverPasswordUsersRecoverEmailPost:
+          path: /recover/{email}
+          method: POST
+          docs: Trigger a password recovery email to be sent.
+          display-name: Recover Password
+          path-parameters:
+            email: string
+
+types:
+  User:
+    properties:
+      id: integer
+      username: string
+      email_address: string
+      role: Role
+      full_name: optional<string>
+      auth_key: optional<string>
+      active: boolean
+      verified: boolean
+      tier_id: integer
+      tier: Tier
+      created_at: string
+      updated_at: string
+      feature_flags: optional<map<string, boolean>>
+
+  Role:
+    enum:
+      - owner
+      - annotator
+      - admin
+
+  Tier:
+    properties:
+      name: string
+      limits: map<string, integer>
+
+  UpdateUserRequest:
+    properties:
+      username: optional<string>
+      email_address: optional<string>
+      password: optional<string>
+      full_name: optional<string>
+      intent: optional<list<string>>
+
+  UserRequest:
+    properties:
+      username: string
+      email_address: string
+      password: string
+      role: optional<_InlinedType0>
+      full_name: optional<string>
+      intent: optional<list<string>>
+
+  _InlinedType0:
+    extends:
+      - commons.RoleEnum
+
+  UserInviteRequest:
+    properties:
+      email_address: string
+      project_id: integer
+      role: optional<_InlinedType1>
+      full_name: optional<string>
+
+  _InlinedType1:
+    extends:
+      - commons.RoleEnum
