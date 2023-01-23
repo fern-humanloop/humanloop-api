@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+services:
+  http:
+    DataSnapshotService:
+      auth: true
+      base-path: /projects/{project_id}/data-snapshots
+      path-parameters:
+        project_id: string
+      endpoints:
+        getAll:
+          path: ""
+          method: GET
+          display-name: Get Project Data Snapshots
+          response: list<DataSnapshot>
+
+        create:
+          path: ""
+          method: POST
+          display-name: Create Data Snapshot
+          request:
+            name: CreateDataSnapshotRequest
+            query-parameters:
+              search: optional<string>
+              metadata_search: optional<string>
+              start_date: optional<string>
+              end_date: optional<string>
+            body:
+              properties:
+                name: string
+                description: optional<string>
+
+        update:
+          path: /{data_snapshot_id}
+          method: PATCH
+          display-name: Update Data Snapshot
+          path-parameters:
+            data_snapshot_id: string
+          request:
+            name: UpdateDataSnapshotRequest
+            body:
+              properties:
+                name: optional<string>
+                description: optional<string>
+          response: DataSnapshot
+
+types:
+  DataSnapshot:
+    properties:
+      id: string
+      name: string
+      description: string
+      filter_params: map<string, unknown>
+      count: integer
+      created_at: datetime
+      updated_at: datetime

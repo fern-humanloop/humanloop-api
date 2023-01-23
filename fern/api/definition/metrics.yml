@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+services:
+  http:
+    MetricsService:
+      auth: true
+      base-path: /projects/{project_id}
+      path-parameters:
+        project_id: string
+      endpoints:
+        getSampleLogs:
+          path: /metrics/logs
+          method: GET
+          display-name: Get Sample Logs
+          response: list<unknown>
+
+        runMetricCalculations:
+          path: /metrics/{metric_id}/run
+          method: POST
+          docs: Calculate metrics across all data in project.
+          display-name: Run Metric Calculations
+          path-parameters:
+            metric_id: string
+
+        getMetricsForModelConfigs:
+          path: /model-config-metrics
+          method: GET
+          display-name: Get Metrics For Model Configs
+          response: list<ModelConfigMetrics>
+
+types:
+  ModelConfigMetrics:
+    properties:
+      model_config_id: string
+      metric_id: string
+      average: double

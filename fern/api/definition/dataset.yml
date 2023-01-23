@@ -1,0 +1,154 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+services:
+  http:
+    DatasetsService:
+      auth: true
+      base-path: /datasets
+      endpoints:
+        getAll:
+          display-name: Get Datasets
+          path: ""
+          method: GET
+          docs: >-
+            Get dataset details and associated field meta-data for any data-sets
+            associated to your user.
+          response: list<Dataset>
+
+        create:
+          display-name: Create Dataset
+          path: ""
+          method: POST
+          docs: >-
+            Upload a dataset that you can use in your Humanloop projects to
+            train models.
+          request:
+            name: CreateDatasetRequest
+            body:
+              properties:
+                name: string
+                data: list<unknown>
+                fields: list<CreateFieldRequest>
+                description: optional<string>
+          response: UpdateDatasetResponse
+
+        get:
+          display-name: Get Dataset
+          path: /{id}
+          path-parameters:
+            id: integer
+          method: GET
+          docs: >-
+            Get dataset details and associated field meta-data for a specific
+            data-set associated to your user.
+          request:
+            name: GetDatasetRequest
+            query-parameters:
+              num_records: optional<integer>
+          response: Dataset
+
+        update:
+          display-name: Update Dataset
+          path: /{id}
+          path-parameters:
+            id: integer
+          method: PUT
+          docs: Update an existing dataset by adding additional data points.
+          request:
+            name: UpdateDatasetRequest
+            body:
+              properties:
+                data: list<unknown>
+          response: UpdateDatasetResponse
+
+        delete:
+          display-name: Delete Dataset
+          path: /{id}
+          path-parameters:
+            id: integer
+          method: DELETE
+          docs: Delete your dataset if it is no longer needed.
+
+        updateDetails:
+          display-name: Update Dataset Details
+          docs: Update the details of your dataset such as its name and description.
+          path: /{id}/metadata
+          path-parameters:
+            id: integer
+          method: PUT
+          request:
+            name: UpdateDatasetDetailsRequest
+            body:
+              properties:
+                name: optional<string>
+                description: optional<string>
+          response: Dataset
+
+types:
+  Dataset:
+    properties:
+      id: integer
+      name: string
+      count: integer
+      data: optional<list<Data>>
+      description: optional<string>
+      public: optional<boolean>
+      fields: optional<list<Field>>
+      field_names: optional<list<string>>
+      created_at: optional<string>
+      updated_at: optional<string>
+      status_counts: optional<map<string, integer>>
+      active: boolean
+
+  Field:
+    properties:
+      id: integer
+      dataset_id: integer
+      name: string
+      display_name: string
+      data_type: commons.DataType
+      required: boolean
+      count: optional<integer>
+      null_count: optional<integer>
+      value_counts: optional<map<string, integer>>
+      latest_counts_increase: optional<map<string, integer>>
+      distinct_values: optional<list<string>>
+      created_at: optional<string>
+      updated_at: optional<string>
+
+  Data:
+    properties:
+      id: integer
+      dataset_id: optional<integer>
+      source: string
+      created_at: optional<string>
+      updated_at: optional<string>
+      processing_status: DataProcessingStatus
+
+  DataProcessingStatus:
+    enum:
+      - processing
+      - completed
+      - failed
+
+  CreateFieldRequest:
+    properties:
+      name: string
+      data_type: commons.DataType
+      display_name: string
+      required: boolean
+      distinct_values: optional<list<string>>
+      default: unknown
+      meta: map<string, unknown>
+
+  UpdateDatasetResponse:
+    properties:
+      id: integer
+      attempted: integer
+      succeeded: integer
+      processing: integer
+      msg: string
+      fields: list<Field>
