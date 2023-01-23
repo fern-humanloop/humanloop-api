@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 imports:
-  commons: commons.yml
+  modelConfiguration: modelConfiguration.yml
 
 services:
   http:
@@ -9,7 +9,7 @@ services:
       auth: true
       base-path: ""
       endpoints:
-        getLogsLogsGet:
+        getLogs:
           path: /logs
           method: GET
           docs: >-
@@ -19,6 +19,7 @@ services:
             for more details.
           display-name: Get Logs
           request:
+            name: GetLogsRequest
             query-parameters:
               project_id: string
               search: optional<string>
@@ -27,14 +28,14 @@ services:
               end_date: optional<string>
               size: optional<integer>
               page: optional<integer>
-          response: PaginatedData_LogResponse_
+          response: LogsPage
 
-        deleteLogsLogsDelete:
+        deleteLogs:
           path: /logs
           method: DELETE
           display-name: Delete Logs
 
-        exportRawLogsExportRawPost:
+        exportRawLogs:
           path: /logs/export-raw
           method: POST
           docs: >-
@@ -44,6 +45,7 @@ services:
             for more details.
           display-name: Export Raw
           request:
+            name: ExportRawLogsRequest
             query-parameters:
               project_id: string
               search: optional<string>
@@ -51,7 +53,7 @@ services:
               start_date: optional<string>
               end_date: optional<string>
 
-        exportFineTuneLogsExportFineTunePost:
+        exportFineTuneLogs:
           path: /logs/export-fine-tune
           method: POST
           docs: >-
@@ -61,6 +63,7 @@ services:
             for more details.
           display-name: Export Fine Tune
           request:
+            name: ExportFineTuneLogsRequest
             query-parameters:
               project_id: string
               search: optional<string>
@@ -69,7 +72,7 @@ services:
               end_date: optional<string>
             body: FineTuneFormatting
 
-        deleteFeedbackLabelProjectsProjectIdFeedbackFeedbackTypeFeedbackValueDelete:
+        deleteFeedbackLabel:
           path: /projects/{project_id}/feedback/{feedback_type}/{feedback_value}
           method: DELETE
           display-name: Delete Feedback Label
@@ -79,12 +82,45 @@ services:
             feedback_value: string
 
 types:
-  PaginatedData_LogResponse_:
+  LogsPage:
     properties:
-      records: list<commons.LogResponse>
+      records: list<Log>
       page: integer
       size: integer
       total: integer
+
+  Log:
+    properties:
+      id: string
+      source: optional<string>
+      model_config: optional<modelConfiguration.ProjectModelConfig>
+      output: string
+      feedback: optional<list<Feedback>>
+      metric_values: optional<list<MetricValues>>
+      data_snapshots: optional<list<LogDataSnapshot>>
+      provider_latency: optional<double>
+      created_at: string
+      updated_at: string
+
+  Feedback:
+    properties:
+      value: string
+      data_id: optional<string>
+      user: optional<string>
+      created_at: optional<string>
+      id: string
+
+  MetricValues:
+    properties:
+      metric_id: string
+      metric_name: string
+      metric_value: double
+
+  LogDataSnapshot:
+    properties:
+      id: string
+      name: string
+      count: integer
 
   FineTuneFormatting:
     properties:

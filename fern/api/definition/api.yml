@@ -1,6 +1,2 @@
 name: api
 auth: bearer
-environments:
-  Production: https://api.example.com
-  Sandbox: https://sandbox.example.com
-default-environment: Production
